@@ -10,6 +10,8 @@ const NO_CONTENT = 204;
 const NOT_FOUND = 404;
 const INTERNAL_ERRO = 500;
 
+const ERRO = 'erro no banco de dados';
+
 const { tokenValidation,
   nameValidation, 
   ageValidation, 
@@ -26,6 +28,25 @@ router.get('/', async (req, res) => {
   return res.status(OK).send(talkers);
 });
 
+router.get('/search', tokenValidation, async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    const data = await (fs.readFile(talkerJson));
+    const talkers = JSON.parse(data);
+
+    if (q === undefined || q.length === 0) return res.status(OK).send(talkers);
+    
+    const talker = talkers.filter((talk) => talk.name.toLowerCase().startsWith(q.toLowerCase()));
+    
+    if (!talker) return res.status(OK).json([]);
+    
+    return res.status(OK).send(talker);
+  } catch (err) {
+    return res.status(INTERNAL_ERRO).end({ mesage: ERRO });
+  }
+});
+
 router.get('/:id', async (req, res) => {
  try {
   const data = await (fs.readFile(talkerJson));
@@ -40,7 +61,7 @@ router.get('/:id', async (req, res) => {
     }
   return res.status(OK).send(found);
  } catch (err) {
-  return res.status(INTERNAL_ERRO).end('erro no banco de dados');
+  return res.status(INTERNAL_ERRO).end({ mesage: ERRO });
  }
 });
 
@@ -64,7 +85,7 @@ try {
   
   return res.status(CREATED).send(talker);
 } catch (err) {
-  return res.status(INTERNAL_ERRO).end('erro no banco de dados');
+  return res.status(INTERNAL_ERRO).end({ mesage: ERRO });
 }
 });
 
@@ -89,7 +110,7 @@ talkValuesValidation, async (req, res) => {
   
     return res.status(OK).send(talkers[found]);
   } catch (err) {
-    return res.status(INTERNAL_ERRO).end('erro no banco de dados');
+    return res.status(INTERNAL_ERRO).end({ mesage: ERRO });
   }
 });
 
@@ -109,7 +130,7 @@ router.delete('/:id', tokenValidation, async (req, res) => {
   
     return res.status(NO_CONTENT).end();
   } catch (err) {
-    return res.status(INTERNAL_ERRO).end('erro no banco de dados');
+    return res.status(INTERNAL_ERRO).end({ mesage: ERRO });
   }
 });
 
