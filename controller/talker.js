@@ -5,9 +5,10 @@ const fs = require('fs').promises;
 
 const router = express.Router();
 const OK = 200;
+const INTERNAL_ERRO = 500;
 const NOT_FOUND = 404;
 
-router.get('/talker', async (req, res) => {
+router.get('/', async (req, res) => {
   const data = await (fs.readFile(talkerJson));
   const talkers = JSON.parse(data);
   
@@ -18,6 +19,7 @@ router.get('/talker', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
+ try {
   const data = await (fs.readFile(talkerJson));
   const talkers = JSON.parse(data);
   const { id } = req.params;
@@ -29,6 +31,9 @@ router.get('/:id', async (req, res) => {
       return res.status(NOT_FOUND).send({ message: 'Pessoa palestrante não encontrada' });
     }
   return res.status(OK).send(found);
+ } catch (e) {
+  return res.status(INTERNAL_ERRO).end('erro no banco de dados');
+ }
 });
 
 module.exports = router;
