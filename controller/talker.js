@@ -96,7 +96,6 @@ talkValuesValidation, async (req, res) => {
 router.delete('/:id', tokenValidation, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, age, talk } = req.body;
     const data = await (fs.readFile(talkerJson));
     const talkers = JSON.parse(data);
   
